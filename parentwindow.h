@@ -26,6 +26,8 @@ private slots:
     void on_newWindow_triggered();
 
 
+    void on_newWindow_hovered();
+
 public:
     void addScrollArea(QWidget *qw);
 

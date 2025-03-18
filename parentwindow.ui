@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>ParentWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(1, 42, 74);
+color: rgb(169, 214, 229);</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
@@ -31,10 +35,11 @@
       </property>
       <property name="font">
        <font>
-        <pointsize>7</pointsize>
-        <bold>true</bold>
+        <pointsize>10</pointsize>
+        <bold>false</bold>
         <strikeout>false</strikeout>
         <stylestrategy>PreferDefault</stylestrategy>
+        <kerning>true</kerning>
        </font>
       </property>
       <property name="toolTipDuration">
@@ -44,7 +49,7 @@
        <bool>false</bool>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(85, 170, 127);</string>
+       <string notr="true"/>
       </property>
       <property name="tabShape">
        <enum>QTabWidget::TabShape::Rounded</enum>
@@ -59,7 +64,7 @@
        </size>
       </property>
       <property name="elideMode">
-       <enum>Qt::TextElideMode::ElideRight</enum>
+       <enum>Qt::TextElideMode::ElideLeft</enum>
       </property>
       <property name="tabsClosable">
        <bool>true</bool>
@@ -106,6 +111,7 @@
     <property name="title">
      <string>About</string>
     </property>
+    <addaction name="actionCPC_Shell"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSave"/>
@@ -113,41 +119,83 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="newWindow">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/Feather Icons/Feather Icons/file-plus.svg</normaloff>:/Feather Icons/Feather Icons/file-plus.svg</iconset>
+   </property>
    <property name="text">
     <string>New Window</string>
    </property>
+   <property name="toolTip">
+    <string>Open New Window</string>
+   </property>
   </action>
   <action name="actionOpen_Folder">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/Feather Icons/Feather Icons/folder.svg</normaloff>:/Feather Icons/Feather Icons/folder.svg</iconset>
+   </property>
    <property name="text">
     <string>Open Folder</string>
    </property>
   </action>
   <action name="actionOpen_File">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/Feather Icons/Feather Icons/file-text.svg</normaloff>:/Feather Icons/Feather Icons/file-text.svg</iconset>
+   </property>
    <property name="text">
     <string>Open File</string>
    </property>
   </action>
   <action name="actionSave_Responses">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/Feather Icons/Feather Icons/save.svg</normaloff>:/Feather Icons/Feather Icons/save.svg</iconset>
+   </property>
    <property name="text">
     <string>Save Responses</string>
    </property>
   </action>
   <action name="actionEdit_Profile">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/Feather Icons/Feather Icons/edit.svg</normaloff>:/Feather Icons/Feather Icons/edit.svg</iconset>
+   </property>
    <property name="text">
     <string>Edit Profile</string>
    </property>
   </action>
   <action name="actionEdit_Theme">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/Feather Icons/Feather Icons/edit-3.svg</normaloff>:/Feather Icons/Feather Icons/edit-3.svg</iconset>
+   </property>
    <property name="text">
     <string>Edit Theme</string>
    </property>
   </action>
   <action name="actionCustomize_Shell">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/Feather Icons/Feather Icons/edit-2.svg</normaloff>:/Feather Icons/Feather Icons/edit-2.svg</iconset>
+   </property>
    <property name="text">
     <string>Customize Shell</string>
    </property>
   </action>
+  <action name="actionCPC_Shell">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/Feather Icons/Feather Icons/info.svg</normaloff>:/Feather Icons/Feather Icons/info.svg</iconset>
+   </property>
+   <property name="text">
+    <string>CPC-Shell</string>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="resource.qrc"/>
+ </resources>
  <connections/>
 </ui>

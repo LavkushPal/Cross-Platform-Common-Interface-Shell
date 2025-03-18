@@ -1,0 +1,4 @@
+<RCC>
+    <qresource prefix="/UI_Resources"/>
+    <qresource prefix="/Feather Icons"/>
+</RCC>

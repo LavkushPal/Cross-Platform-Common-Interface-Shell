@@ -1,15 +1,17 @@
 #include "responsewindow.h"
 #include "ui_responsewindow.h"
 
+
+#include<cstdlib>
 #include<iostream>
 #include<string>
+
 #include<QProcess>
 #include<QTextEdit>
 #include<QLabel>
 #include<QPoint>
 #include<QDir>
 #include<QMessageBox>
-
 
 using namespace std;
 
@@ -21,6 +23,8 @@ ResponseWindow::ResponseWindow(ParentWindow *pwq,int tabIndex,QWidget *parent)
     , ui(new Ui::ResponseWindow)
 {
     ui->setupUi(this);
+    ui->lineEdit->setPlaceholderText("Type here");
+    ui->lineEdit->setToolTip("Type your command here");
 }
 
 //destructor
@@ -67,6 +71,30 @@ void ResponseWindow::setNewResponseWindow() {
 }
 
 
+// Check if a command is a Windows shell built-in
+bool isShellBuiltinWindows(const std::string& command) {
+    std::string cmd = "cmd /c \"ver >nul && " + command + " 2>nul\"";
+    return (system(cmd.c_str()) == 0);
+}
+
+// Check if a command is an executable file in Windows
+bool isExecutableFileWindows(const std::string& command) {
+    std::string cmd = "where " + command + " >nul 2>&1";
+    return (system(cmd.c_str()) == 0);
+}
+
+// Check if a command is a Linux shell built-in
+bool isShellBuiltinLinux(const std::string& command) {
+    std::string cmd = "type " + command + " 2>/dev/null | grep -q 'builtin'";
+    return (system(cmd.c_str()) == 0);
+}
+
+// Check if a command is an executable file in Linux
+bool isExecutableFileLinux(const std::string& command) {
+    std::string cmd = "which " + command + " > /dev/null 2>&1";
+    return (system(cmd.c_str()) == 0);
+}
+
 void ResponseWindow::on_lineEdit_editingFinished()
 {
         string strInput;
@@ -89,32 +117,46 @@ void ResponseWindow::on_lineEdit_editingFinished()
             }
         }
 
-        if(qstrInput.isEmpty()) //if empty string just return
+        if(qstrInput.isEmpty()){
+            ui->outputDisplayLabel->setText("Please enter some input");
+            setNewResponseWindow(); //setting fresh input window
             return;
+        }
 
         QProcess *process=new QProcess(this);
 
-        #ifdef Q_OS_WIN
-            if(qstrInput.contains(" ")|| qstrInput.contains('|') || qstrInput.contains('>') || qstrInput.contains('<'))
-                process->start("cmd.exe", QStringList() << "/C" << qstrInput); // Windows: Use cmd.exe to execute shell commands
-            else
-                process->start(qstrInput);// if input contains itself a executable line run.c ,run.py
-        #else
-            if(qstrInput.contains(" ")|| qstrInput.contains('|') || qstrInput.contains('>') || qstrInput.contains('<'))
-                process->start("/bin/sh", QStringList() << "-c" << qstrInput);  // Linux/macOS: Use bash/sh to execute shell commands
-            else
-                process->start(qstrInput); // if input contains itself a executable line run.c ,run.py
+        strInput=qstrInput.toStdString();
 
+        #ifdef Q_OS_WIN
+            if(isShellBuiltinWindows(strInput))
+                process->start("cmd.exe", QStringList() << "/C" << qstrInput); // Windows: Use cmd.exe to execute shell commands
+            else if(isExecutableFileWindows(strInput))
+                process->start(qstrInput);// if input contains itself a executable line run.c ,run.py
+            else{
+                ui->outputDisplayLabel->setText("Please enter valid command.");
+                setNewResponseWindow(); //setting fresh input window
+                return;
+            }
+        #else
+            if(isShellBuiltinLinux(strInput))
+                process->start("/bin/sh", QStringList() << "-c" << qstrInput);  // Linux/macOS: Use bash/sh to execute shell commands
+            else if(isExecutableFileLinux(strInput))
+                process->start(qstrInput); // if input contains itself a executable line run.c ,run.py
+            else{
+                ui->outputDisplayLabel->setText("Please enter valid command.");
+                setNewResponseWindow(); //setting fresh input window
+                return;
+            }
         #endif
 
         if(!process->waitForStarted()){
-            cout<<"Process Creation faild.";
+            ui->outputDisplayLabel->setText("Process Creation faild.");
             process->deleteLater();
             return;
         }
 
         if(!process->waitForFinished()){
-            cout<<"Process is not yet Finished.";
+            ui->outputDisplayLabel->setText("Process is not yet Finished.");
             process->deleteLater();
             return;
         }
@@ -127,11 +169,17 @@ void ResponseWindow::on_lineEdit_editingFinished()
         strOutput=qstrOutput.toStdString(); //converts to standard string
 
         //set output to display label
-        ui->outputDisplayLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding); //vertically can expand
-        ui->outputDisplayLabel->setText(qstrOutput); //sets content to label
+        ui->outputDisplayLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum); //vertically can expand
+
+        if(qstrOutput.isEmpty())
+            ui->outputDisplayLabel->setText("Sorry,output does not found");
+        else
+            ui->outputDisplayLabel->setText(qstrOutput); //sets content to label
+
         ui->outputDisplayLabel->adjustSize(); //adjuct if contetnt has more lines
         ui->outputDisplayLabel->setWordWrap(true);
-        ui->outputDisplayLabel->setAlignment(Qt::AlignLeft);
+        ui->outputDisplayLabel->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+        ui->outputDisplayLabel->setMinimumSize(QSize(0, 0));
 
         qDebug()<<" called for next input line";
         setNewResponseWindow(); // now it create new response window beneath the current res window

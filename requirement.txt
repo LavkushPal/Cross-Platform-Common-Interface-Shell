@@ -1,0 +1,10 @@
+steps to this project 
+start date :27/02/2025 & end date: till march
+
+
+1) choose platform : cross platform(ubuntu & windows both) 
+2) build user interface : c++ with qt framework
+3) customization- make styles,Themes, fonts, shortcuts, and extensions for UI
+4) core features- write code for first basic shell 
+5) add more features 
+6) advance features- like Multi-tab support, scripting, autocomplete,parallel scheduling etc

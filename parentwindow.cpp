@@ -5,6 +5,7 @@
 #include<QVBoxLayout>
 #include<QMessageBox>
 #include <QScrollArea>
+#include <QTabBar>
 
 #define MAX_TAB_OPENING 10
 using namespace std;
@@ -16,8 +17,21 @@ ParentWindow::ParentWindow(QWidget *parent)
     ui->setupUi(this);
 
     //creates new tab with respoonse window on startup of app
-    this->addResponseWindowToTab(ui->parentTabContainer->count());
 
+    ui->parentTabContainer->setStyleSheet(
+        "QTabWidget::pane { "
+        "   border: 1px solid #2C7DA0;"
+        "   border-radius: 2px; }"
+
+            // "QTabBar::tab { border: 1px solid black; }"
+
+        "QTabBar::tab:selected {"
+        "   background:#2C7DA0;"
+        "   opacity:0.7; "
+        "   padding-left:2px ; "
+        "   padding-right:2px; }"
+     );
+    this->addResponseWindowToTab(ui->parentTabContainer->count());
 }
 
 ParentWindow::~ParentWindow()
@@ -32,17 +46,37 @@ void ParentWindow::on_parentTabContainer_currentChanged(int index)
 
 void ParentWindow::on_parentTabContainer_tabCloseRequested(int index)
 {
-    QMessageBox msg;
-
-    // if(index==0){ avoiding to remove all the tab
-    //     msg.information(this,"Closing Windows","Base Window couldn't be closed",msg.Yes,msg.No);
-    //     msg.exec();
-    //     return;
-    // }
-
     ui->parentTabContainer->removeTab(index);
+
+    int tabCount = ui->parentTabContainer->count();
+
+    // Rename remaining tabs sequentially
+    for (int i = index; i < tabCount; ++i) {
+        QWidget *currentTab = ui->parentTabContainer->widget(i);
+        if (currentTab) {
+            QString newTitle = "Tab" + QString::number(i + 1); // Proper conversion
+            ui->parentTabContainer->setTabText(i, newTitle);
+        }
+    }
+
+    QTabBar *tabBar = ui->parentTabContainer->tabBar();
+
+    // Check if tabs exceed available width
+    int totalTabWidth = 0;
+    for (int i = 0; i < tabBar->count(); ++i) {
+        totalTabWidth += tabBar->tabRect(i).width();
+    }
+
+    int availableWidth = ui->parentTabContainer->width();
+
+    // Enable scroll buttons only if tabs exceed available width
+    tabBar->setUsesScrollButtons(totalTabWidth > availableWidth);
+
+    qApp->processEvents(); //force to update ui
     ui->parentTabContainer->update();
 }
+
+
 
 
 void ParentWindow::on_newWindow_triggered() {
@@ -56,7 +90,11 @@ void ParentWindow::on_newWindow_triggered() {
 
     //creates new tab with respoonse window on request new window
     this->addResponseWindowToTab(ui->parentTabContainer->count());
+}
 
+//to check whether tab exists for provided index
+bool isTabExists(QTabWidget *tabWidget, int index) {
+    return (index >= 0 && index < tabWidget->count() && tabWidget->widget(index) != nullptr);
 }
 
 
@@ -67,11 +105,16 @@ void ParentWindow::addResponseWindowToTab(int tabIndex) {
         return;
     }
 
+    qDebug()<<"\n tabIndex passed"<<tabIndex<<" . tab index by function count "<<ui->parentTabContainer->count();
+
+    // tabIndex >= ui->parentTabContainer->count()
     // Ensure the tab exists before accessing it
-    if(tabIndex >= ui->parentTabContainer->count()) { //creatingn tab here
+
+    if(!isTabExists(ui->parentTabContainer, tabIndex)) { //creatingn tab here
         QWidget *newTab = new QWidget();
         ui->parentTabContainer->addTab(newTab, QString("Tab %1").arg(ui->parentTabContainer->count()+1));
         //inititalize tab by adding 1 mandatory as requirment for creating not creating when come again
+        qDebug()<<"new tab creadted for passed index :"<<tabIndex;
     }
 
     qDebug()<<"\n tabIndex passed"<<tabIndex<<" . tab index by function count "<<ui->parentTabContainer->count();
@@ -97,6 +140,7 @@ void ParentWindow::addResponseWindowToTab(int tabIndex) {
         containerWidget->setLayout(new QVBoxLayout());
 
         qsa->setWidget(containerWidget);
+        qsa->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
         // qsa->setBackgroundRole(QPalette::Dark);
         // qsa->setForegroundRole(QPalette::Shadow);
 
@@ -117,9 +161,11 @@ void ParentWindow::addResponseWindowToTab(int tabIndex) {
     QCursor cur;
     res->setCursor(cur);
 
-    res->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+    res->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
     layout->addWidget(res); //adding response wndow
-    layout->setAlignment(Qt::AlignTop);
+    layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    layout->setContentsMargins(5, 5, 5, 5);
+    layout->setSpacing(2);
 
     containerWidget->adjustSize(); //makes reponsive ui
     qsa->update(); //update all changes
@@ -130,4 +176,10 @@ void ParentWindow::addResponseWindowToTab(int tabIndex) {
 
 
 
+
+
+void ParentWindow::on_newWindow_hovered()
+{
+
+}
 

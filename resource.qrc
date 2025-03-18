@@ -1,0 +1,330 @@
+<RCC>
+    <qresource prefix="/Feather Icons">
+        <file>Feather Icons/activity.svg</file>
+        <file>Feather Icons/airplay.svg</file>
+        <file>Feather Icons/alert-circle.svg</file>
+        <file>Feather Icons/alert-octagon.svg</file>
+        <file>Feather Icons/alert-triangle.svg</file>
+        <file>Feather Icons/align-center.svg</file>
+        <file>Feather Icons/align-justify.svg</file>
+        <file>Feather Icons/align-left.svg</file>
+        <file>Feather Icons/align-right.svg</file>
+        <file>Feather Icons/anchor.svg</file>
+        <file>Feather Icons/aperture.svg</file>
+        <file>Feather Icons/archive.svg</file>
+        <file>Feather Icons/arrow-down.svg</file>
+        <file>Feather Icons/arrow-down-circle.svg</file>
+        <file>Feather Icons/arrow-down-left.svg</file>
+        <file>Feather Icons/arrow-down-right.svg</file>
+        <file>Feather Icons/arrow-left.svg</file>
+        <file>Feather Icons/arrow-left-circle.svg</file>
+        <file>Feather Icons/arrow-right.svg</file>
+        <file>Feather Icons/arrow-right-circle.svg</file>
+        <file>Feather Icons/arrow-up.svg</file>
+        <file>Feather Icons/arrow-up-circle.svg</file>
+        <file>Feather Icons/arrow-up-left.svg</file>
+        <file>Feather Icons/arrow-up-right.svg</file>
+        <file>Feather Icons/at-sign.svg</file>
+        <file>Feather Icons/award.svg</file>
+        <file>Feather Icons/bar-chart.svg</file>
+        <file>Feather Icons/bar-chart-2.svg</file>
+        <file>Feather Icons/battery.svg</file>
+        <file>Feather Icons/battery-charging.svg</file>
+        <file>Feather Icons/bell.svg</file>
+        <file>Feather Icons/bell-off.svg</file>
+        <file>Feather Icons/bluetooth.svg</file>
+        <file>Feather Icons/bold.svg</file>
+        <file>Feather Icons/book.svg</file>
+        <file>Feather Icons/bookmark.svg</file>
+        <file>Feather Icons/book-open.svg</file>
+        <file>Feather Icons/box.svg</file>
+        <file>Feather Icons/briefcase.svg</file>
+        <file>Feather Icons/calendar.svg</file>
+        <file>Feather Icons/camera.svg</file>
+        <file>Feather Icons/camera-off.svg</file>
+        <file>Feather Icons/cast.svg</file>
+        <file>Feather Icons/check.svg</file>
+        <file>Feather Icons/check-circle.svg</file>
+        <file>Feather Icons/check-square.svg</file>
+        <file>Feather Icons/chevron-down.svg</file>
+        <file>Feather Icons/chevron-left.svg</file>
+        <file>Feather Icons/chevron-right.svg</file>
+        <file>Feather Icons/chevrons-down.svg</file>
+        <file>Feather Icons/chevrons-left.svg</file>
+        <file>Feather Icons/chevrons-right.svg</file>
+        <file>Feather Icons/chevrons-up.svg</file>
+        <file>Feather Icons/chevron-up.svg</file>
+        <file>Feather Icons/chrome.svg</file>
+        <file>Feather Icons/circle.svg</file>
+        <file>Feather Icons/clipboard.svg</file>
+        <file>Feather Icons/clock.svg</file>
+        <file>Feather Icons/cloud.svg</file>
+        <file>Feather Icons/cloud-drizzle.svg</file>
+        <file>Feather Icons/cloud-lightning.svg</file>
+        <file>Feather Icons/cloud-off.svg</file>
+        <file>Feather Icons/cloud-rain.svg</file>
+        <file>Feather Icons/cloud-snow.svg</file>
+        <file>Feather Icons/code.svg</file>
+        <file>Feather Icons/codepen.svg</file>
+        <file>Feather Icons/codesandbox.svg</file>
+        <file>Feather Icons/coffee.svg</file>
+        <file>Feather Icons/columns.svg</file>
+        <file>Feather Icons/command.svg</file>
+        <file>Feather Icons/compass.svg</file>
+        <file>Feather Icons/copy.svg</file>
+        <file>Feather Icons/corner-down-left.svg</file>
+        <file>Feather Icons/corner-down-right.svg</file>
+        <file>Feather Icons/corner-left-down.svg</file>
+        <file>Feather Icons/corner-left-up.svg</file>
+        <file>Feather Icons/corner-right-down.svg</file>
+        <file>Feather Icons/corner-right-up.svg</file>
+        <file>Feather Icons/corner-up-left.svg</file>
+        <file>Feather Icons/corner-up-right.svg</file>
+        <file>Feather Icons/cpu.svg</file>
+        <file>Feather Icons/credit-card.svg</file>
+        <file>Feather Icons/crop.svg</file>
+        <file>Feather Icons/crosshair.svg</file>
+        <file>Feather Icons/database.svg</file>
+        <file>Feather Icons/delete.svg</file>
+        <file>Feather Icons/disc.svg</file>
+        <file>Feather Icons/divide.svg</file>
+        <file>Feather Icons/divide-circle.svg</file>
+        <file>Feather Icons/divide-square.svg</file>
+        <file>Feather Icons/dollar-sign.svg</file>
+        <file>Feather Icons/download.svg</file>
+        <file>Feather Icons/download-cloud.svg</file>
+        <file>Feather Icons/dribbble.svg</file>
+        <file>Feather Icons/droplet.svg</file>
+        <file>Feather Icons/edit.svg</file>
+        <file>Feather Icons/edit-2.svg</file>
+        <file>Feather Icons/edit-3.svg</file>
+        <file>Feather Icons/external-link.svg</file>
+        <file>Feather Icons/eye.svg</file>
+        <file>Feather Icons/eye-off.svg</file>
+        <file>Feather Icons/facebook.svg</file>
+        <file>Feather Icons/fast-forward.svg</file>
+        <file>Feather Icons/feather.svg</file>
+        <file>Feather Icons/figma.svg</file>
+        <file>Feather Icons/file.svg</file>
+        <file>Feather Icons/file-minus.svg</file>
+        <file>Feather Icons/file-plus.svg</file>
+        <file>Feather Icons/file-text.svg</file>
+        <file>Feather Icons/film.svg</file>
+        <file>Feather Icons/filter.svg</file>
+        <file>Feather Icons/flag.svg</file>
+        <file>Feather Icons/folder.svg</file>
+        <file>Feather Icons/folder-minus.svg</file>
+        <file>Feather Icons/folder-plus.svg</file>
+        <file>Feather Icons/framer.svg</file>
+        <file>Feather Icons/frown.svg</file>
+        <file>Feather Icons/gift.svg</file>
+        <file>Feather Icons/git-branch.svg</file>
+        <file>Feather Icons/git-commit.svg</file>
+        <file>Feather Icons/github.svg</file>
+        <file>Feather Icons/gitlab.svg</file>
+        <file>Feather Icons/git-merge.svg</file>
+        <file>Feather Icons/git-pull-request.svg</file>
+        <file>Feather Icons/globe.svg</file>
+        <file>Feather Icons/grid.svg</file>
+        <file>Feather Icons/hard-drive.svg</file>
+        <file>Feather Icons/hash.svg</file>
+        <file>Feather Icons/headphones.svg</file>
+        <file>Feather Icons/heart.svg</file>
+        <file>Feather Icons/help-circle.svg</file>
+        <file>Feather Icons/hexagon.svg</file>
+        <file>Feather Icons/home.svg</file>
+        <file>Feather Icons/image.svg</file>
+        <file>Feather Icons/inbox.svg</file>
+        <file>Feather Icons/info.svg</file>
+        <file>Feather Icons/instagram.svg</file>
+        <file>Feather Icons/italic.svg</file>
+        <file>Feather Icons/key.svg</file>
+        <file>Feather Icons/layers.svg</file>
+        <file>Feather Icons/layout.svg</file>
+        <file>Feather Icons/life-buoy.svg</file>
+        <file>Feather Icons/link.svg</file>
+        <file>Feather Icons/link-2.svg</file>
+        <file>Feather Icons/linkedin.svg</file>
+        <file>Feather Icons/list.svg</file>
+        <file>Feather Icons/loader.svg</file>
+        <file>Feather Icons/lock.svg</file>
+        <file>Feather Icons/log-in.svg</file>
+        <file>Feather Icons/log-out.svg</file>
+        <file>Feather Icons/mail.svg</file>
+        <file>Feather Icons/map.svg</file>
+        <file>Feather Icons/map-pin.svg</file>
+        <file>Feather Icons/maximize.svg</file>
+        <file>Feather Icons/maximize-2.svg</file>
+        <file>Feather Icons/meh.svg</file>
+        <file>Feather Icons/menu.svg</file>
+        <file>Feather Icons/message-circle.svg</file>
+        <file>Feather Icons/message-square.svg</file>
+        <file>Feather Icons/mic.svg</file>
+        <file>Feather Icons/mic-off.svg</file>
+        <file>Feather Icons/minimize.svg</file>
+        <file>Feather Icons/minimize-2.svg</file>
+        <file>Feather Icons/minus.svg</file>
+        <file>Feather Icons/minus-circle.svg</file>
+        <file>Feather Icons/minus-square.svg</file>
+        <file>Feather Icons/monitor.svg</file>
+        <file>Feather Icons/moon.svg</file>
+        <file>Feather Icons/more-horizontal.svg</file>
+        <file>Feather Icons/more-vertical.svg</file>
+        <file>Feather Icons/mouse-pointer.svg</file>
+        <file>Feather Icons/move.svg</file>
+        <file>Feather Icons/music.svg</file>
+        <file>Feather Icons/navigation.svg</file>
+        <file>Feather Icons/navigation-2.svg</file>
+        <file>Feather Icons/octagon.svg</file>
+        <file>Feather Icons/package.svg</file>
+        <file>Feather Icons/paperclip.svg</file>
+        <file>Feather Icons/pause.svg</file>
+        <file>Feather Icons/pause-circle.svg</file>
+        <file>Feather Icons/pen-tool.svg</file>
+        <file>Feather Icons/percent.svg</file>
+        <file>Feather Icons/phone.svg</file>
+        <file>Feather Icons/phone-call.svg</file>
+        <file>Feather Icons/phone-forwarded.svg</file>
+        <file>Feather Icons/phone-incoming.svg</file>
+        <file>Feather Icons/phone-missed.svg</file>
+        <file>Feather Icons/phone-off.svg</file>
+        <file>Feather Icons/phone-outgoing.svg</file>
+        <file>Feather Icons/pie-chart.svg</file>
+        <file>Feather Icons/play.svg</file>
+        <file>Feather Icons/play-circle.svg</file>
+        <file>Feather Icons/plus.svg</file>
+        <file>Feather Icons/plus-circle.svg</file>
+        <file>Feather Icons/plus-square.svg</file>
+        <file>Feather Icons/pocket.svg</file>
+        <file>Feather Icons/power.svg</file>
+        <file>Feather Icons/printer.svg</file>
+        <file>Feather Icons/radio.svg</file>
+        <file>Feather Icons/refresh-ccw.svg</file>
+        <file>Feather Icons/refresh-cw.svg</file>
+        <file>Feather Icons/repeat.svg</file>
+        <file>Feather Icons/rewind.svg</file>
+        <file>Feather Icons/rotate-ccw.svg</file>
+        <file>Feather Icons/rotate-cw.svg</file>
+        <file>Feather Icons/rss.svg</file>
+        <file>Feather Icons/save.svg</file>
+        <file>Feather Icons/scissors.svg</file>
+        <file>Feather Icons/search.svg</file>
+        <file>Feather Icons/send.svg</file>
+        <file>Feather Icons/server.svg</file>
+        <file>Feather Icons/settings.svg</file>
+        <file>Feather Icons/share.svg</file>
+        <file>Feather Icons/share-2.svg</file>
+        <file>Feather Icons/shield.svg</file>
+        <file>Feather Icons/shield-off.svg</file>
+        <file>Feather Icons/shopping-bag.svg</file>
+        <file>Feather Icons/shopping-cart.svg</file>
+        <file>Feather Icons/shuffle.svg</file>
+        <file>Feather Icons/sidebar.svg</file>
+        <file>Feather Icons/skip-back.svg</file>
+        <file>Feather Icons/skip-forward.svg</file>
+        <file>Feather Icons/slack.svg</file>
+        <file>Feather Icons/slash.svg</file>
+        <file>Feather Icons/sliders.svg</file>
+        <file>Feather Icons/smartphone.svg</file>
+        <file>Feather Icons/smile.svg</file>
+        <file>Feather Icons/speaker.svg</file>
+        <file>Feather Icons/square.svg</file>
+        <file>Feather Icons/star.svg</file>
+        <file>Feather Icons/stop-circle.svg</file>
+        <file>Feather Icons/sun.svg</file>
+        <file>Feather Icons/sunrise.svg</file>
+        <file>Feather Icons/sunset.svg</file>
+        <file>Feather Icons/table.svg</file>
+        <file>Feather Icons/tablet.svg</file>
+        <file>Feather Icons/tag.svg</file>
+        <file>Feather Icons/target.svg</file>
+        <file>Feather Icons/terminal.svg</file>
+        <file>Feather Icons/thermometer.svg</file>
+        <file>Feather Icons/thumbs-down.svg</file>
+        <file>Feather Icons/thumbs-up.svg</file>
+        <file>Feather Icons/toggle-left.svg</file>
+        <file>Feather Icons/toggle-right.svg</file>
+        <file>Feather Icons/tool.svg</file>
+        <file>Feather Icons/trash.svg</file>
+        <file>Feather Icons/trash-2.svg</file>
+        <file>Feather Icons/trello.svg</file>
+        <file>Feather Icons/trending-down.svg</file>
+        <file>Feather Icons/trending-up.svg</file>
+        <file>Feather Icons/triangle.svg</file>
+        <file>Feather Icons/truck.svg</file>
+        <file>Feather Icons/tv.svg</file>
+        <file>Feather Icons/twitch.svg</file>
+        <file>Feather Icons/twitter.svg</file>
+        <file>Feather Icons/type.svg</file>
+        <file>Feather Icons/umbrella.svg</file>
+        <file>Feather Icons/underline.svg</file>
+        <file>Feather Icons/unlock.svg</file>
+        <file>Feather Icons/upload.svg</file>
+        <file>Feather Icons/upload-cloud.svg</file>
+        <file>Feather Icons/user.svg</file>
+        <file>Feather Icons/user-check.svg</file>
+        <file>Feather Icons/user-minus.svg</file>
+        <file>Feather Icons/user-plus.svg</file>
+        <file>Feather Icons/users.svg</file>
+        <file>Feather Icons/user-x.svg</file>
+        <file>Feather Icons/video.svg</file>
+        <file>Feather Icons/video-off.svg</file>
+        <file>Feather Icons/voicemail.svg</file>
+        <file>Feather Icons/volume.svg</file>
+        <file>Feather Icons/volume-1.svg</file>
+        <file>Feather Icons/volume-2.svg</file>
+        <file>Feather Icons/volume-x.svg</file>
+        <file>Feather Icons/watch.svg</file>
+        <file>Feather Icons/wifi.svg</file>
+        <file>Feather Icons/wifi-off.svg</file>
+        <file>Feather Icons/wind.svg</file>
+        <file>Feather Icons/x.svg</file>
+        <file>Feather Icons/x-circle.svg</file>
+        <file>Feather Icons/x-octagon.svg</file>
+        <file>Feather Icons/x-square.svg</file>
+        <file>Feather Icons/youtube.svg</file>
+        <file>Feather Icons/zap.svg</file>
+        <file>Feather Icons/zap-off.svg</file>
+        <file>Feather Icons/zoom-in.svg</file>
+        <file>Feather Icons/zoom-out.svg</file>
+    </qresource>
+    <qresource prefix="/fonts">
+        <file>fonts/ttf/JetBrainsMono-BoldItalic.ttf</file>
+        <file>fonts/ttf/JetBrainsMono-ExtraBold.ttf</file>
+        <file>fonts/ttf/JetBrainsMono-ExtraBoldItalic.ttf</file>
+        <file>fonts/ttf/JetBrainsMono-ExtraLight.ttf</file>
+        <file>fonts/ttf/JetBrainsMono-ExtraLightItalic.ttf</file>
+        <file>fonts/ttf/JetBrainsMono-Italic.ttf</file>
+        <file>fonts/ttf/JetBrainsMono-Light.ttf</file>
+        <file>fonts/ttf/JetBrainsMono-LightItalic.ttf</file>
+        <file>fonts/ttf/JetBrainsMono-Medium.ttf</file>
+        <file>fonts/ttf/JetBrainsMono-MediumItalic.ttf</file>
+        <file>fonts/ttf/JetBrainsMonoNL-Bold.ttf</file>
+        <file>fonts/ttf/JetBrainsMonoNL-BoldItalic.ttf</file>
+        <file>fonts/ttf/JetBrainsMonoNL-ExtraBold.ttf</file>
+        <file>fonts/ttf/JetBrainsMonoNL-ExtraBoldItalic.ttf</file>
+        <file>fonts/ttf/JetBrainsMonoNL-ExtraLight.ttf</file>
+        <file>fonts/ttf/JetBrainsMonoNL-ExtraLightItalic.ttf</file>
+        <file>fonts/ttf/JetBrainsMonoNL-Italic.ttf</file>
+        <file>fonts/ttf/JetBrainsMonoNL-Light.ttf</file>
+        <file>fonts/ttf/JetBrainsMonoNL-LightItalic.ttf</file>
+        <file>fonts/ttf/JetBrainsMonoNL-Medium.ttf</file>
+        <file>fonts/ttf/JetBrainsMonoNL-MediumItalic.ttf</file>
+        <file>fonts/ttf/JetBrainsMonoNL-Regular.ttf</file>
+        <file>fonts/ttf/JetBrainsMonoNL-SemiBold.ttf</file>
+        <file>fonts/ttf/JetBrainsMonoNL-SemiBoldItalic.ttf</file>
+        <file>fonts/ttf/JetBrainsMonoNL-Thin.ttf</file>
+        <file>fonts/ttf/JetBrainsMonoNL-ThinItalic.ttf</file>
+        <file>fonts/ttf/JetBrainsMono-Regular.ttf</file>
+        <file>fonts/ttf/JetBrainsMono-SemiBold.ttf</file>
+        <file>fonts/ttf/JetBrainsMono-SemiBoldItalic.ttf</file>
+        <file>fonts/ttf/JetBrainsMono-Thin.ttf</file>
+        <file>fonts/ttf/JetBrainsMono-ThinItalic.ttf</file>
+    </qresource>
+    <qresource prefix="/img">
+        <file>ColorView.webp</file>
+    </qresource>
+    <qresource prefix="/other"/>
+    <qresource prefix="/other2"/>
+    <qresource prefix="/other3"/>
+</RCC>
