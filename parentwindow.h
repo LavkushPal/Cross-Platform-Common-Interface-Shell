@@ -2,7 +2,8 @@
 #define PARENTWINDOW_H
 
 #include <QMainWindow>
-// #include "basewindow.h"
+#include <unordered_map>
+#include<QDir>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -17,6 +18,9 @@ class ParentWindow : public QMainWindow
 public:
     ParentWindow(QWidget *parent = nullptr);
     ~ParentWindow();
+
+public:
+    std::unordered_map<int,QDir> current_directory_map;
 
 private slots:
     void on_parentTabContainer_currentChanged(int index);

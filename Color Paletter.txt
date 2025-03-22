@@ -1,7 +1,11 @@
 Here's a mockup of your terminal UI based on the Deep Blues & Aqua palette with Teal 50 & Green 50 highlights. It will follow a modern, tech-friendly aesthetic with:
 
 Dark navy background (#012A4A)
+
 Lighter blue text (#A9D6E5) for readability
+
 Teal 50 (#E0F2F1) for prompt highlights
+
 Green 50 (#E8F5E9) for success messages
+
 Neon cyan (#00FFFF) for an eye-catching futuristic touch

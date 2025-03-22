@@ -6,6 +6,7 @@
 #include<QMessageBox>
 #include <QScrollArea>
 #include <QTabBar>
+#include <QDir>
 
 #define MAX_TAB_OPENING 10
 using namespace std;
@@ -100,19 +101,20 @@ bool isTabExists(QTabWidget *tabWidget, int index) {
 
 void ParentWindow::addResponseWindowToTab(int tabIndex) {
 
-    if (tabIndex < 0) {
+    if(tabIndex < 0) {
         qDebug() << "Invalid tab index!" << tabIndex;
         return;
     }
 
     qDebug()<<"\n tabIndex passed"<<tabIndex<<" . tab index by function count "<<ui->parentTabContainer->count();
 
-    // tabIndex >= ui->parentTabContainer->count()
-    // Ensure the tab exists before accessing it
-
     if(!isTabExists(ui->parentTabContainer, tabIndex)) { //creatingn tab here
         QWidget *newTab = new QWidget();
         ui->parentTabContainer->addTab(newTab, QString("Tab %1").arg(ui->parentTabContainer->count()+1));
+
+        QDir dir;//dir object
+        current_directory_map[ui->parentTabContainer->count()+1]=dir; //storing one object for mentaning directory level
+
         //inititalize tab by adding 1 mandatory as requirment for creating not creating when come again
         qDebug()<<"new tab creadted for passed index :"<<tabIndex;
     }
@@ -126,7 +128,7 @@ void ParentWindow::addResponseWindowToTab(int tabIndex) {
     }
 
     // Ensure the tab has a layout
-    if (!tabWidget->layout()) {
+    if(!tabWidget->layout()) {
         QVBoxLayout *tabLayout = new QVBoxLayout();
         tabWidget->setLayout(tabLayout);
     }
@@ -154,12 +156,14 @@ void ParentWindow::addResponseWindowToTab(int tabIndex) {
 
     // Create and add new ResponseWindow
     ResponseWindow *res = new ResponseWindow(this, tabIndex);
-    res->setCurrentDirectory();
+    res->setCurrentDirectory(tabIndex);
     res->setFocusPolicy(Qt::TabFocus);
 
 
     QCursor cur;
     res->setCursor(cur);
+
+
 
     res->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
     layout->addWidget(res); //adding response wndow
@@ -173,7 +177,6 @@ void ParentWindow::addResponseWindowToTab(int tabIndex) {
 
     qDebug() << "Added new ResponseWindow to tab: " << tabIndex;
 }
-
 
 
 

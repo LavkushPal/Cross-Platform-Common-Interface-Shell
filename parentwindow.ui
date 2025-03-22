@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>ParentWindow</string>
+   <string>CPC-Shell</string>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(1, 42, 74);
