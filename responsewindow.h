@@ -43,6 +43,7 @@ class ResponseWindow : public QWidget {
         void copyFileToFileData(const QStringList &,QString,QProcess *);
         void deleteFiles(const QStringList &,QString,QProcess *);
         void moveFiles(const QStringList &,QString,QProcess *);
+        bool fileExists(const QString &);
 
 
     private:

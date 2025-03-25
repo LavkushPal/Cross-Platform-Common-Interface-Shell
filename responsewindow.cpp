@@ -3,7 +3,6 @@
 
 
 #include<cstdlib>
-// #include<iostream>
 #include<string>
 #include <unordered_map>
 
@@ -134,97 +133,7 @@ void ResponseWindow::setNewResponseWindow() {
 
 
 
-// Function to tokenize input (simple whitespace splitting)
-QStringList tokenizeInput(const QString &input) {
-    return input.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
-}
 
-// // Check if the given path exists
-// bool fileExists(const QString &filePath) {
-//     QFileInfo fileInfo(filePath);
-//     return fileInfo.exists();
-// }
-
-// // Check if the file is executable
-// bool isExecutable(const QString &filePath) {
-// #ifdef Q_OS_WIN
-//     // On Windows, check extension
-//     return filePath.endsWith(".exe", Qt::CaseInsensitive) ||
-//            filePath.endsWith(".bat", Qt::CaseInsensitive) ||
-//            filePath.endsWith(".cmd", Qt::CaseInsensitive);
-// #else
-//     // On Linux/Unix, check executable permission
-//     QFileInfo fileInfo(filePath);
-//     return fileInfo.isExecutable();
-// #endif
-// }
-
-// // Check if file is source code (this is a simple check by extension)
-// bool isSourceFile(const QString &filePath) {
-//     return filePath.endsWith(".c", Qt::CaseInsensitive) ||
-//            filePath.endsWith(".cpp", Qt::CaseInsensitive) ||
-//            filePath.endsWith(".py", Qt::CaseInsensitive);
-// }
-
-// // Dummy function: determine if source code needs compilation
-// bool needsCompilation(const QString &filePath) {
-//     // For example, C/C++ source files need compilation
-//     return filePath.endsWith(".c", Qt::CaseInsensitive) ||
-//            filePath.endsWith(".cpp", Qt::CaseInsensitive);
-// }
-
-// // Launch an executable process
-// void launchProcess(const QString &command, const QStringList &arguments,QProcess *process) {
-//     process->setProgram(command);
-//     process->setArguments(arguments.mid(1)); // exclude command itself
-//     process->start();
-//     if (!process->waitForStarted()) {
-//         qDebug() << "Failed to start process:" << command;
-//         delete process;
-//         return;
-//     }
-//     // Optionally, wait for the process to finish and capture output
-//     process->waitForFinished();
-//     qDebug() << "Process output:" << process->readAllStandardOutput();
-//     delete process;
-// }
-
-// // Compile the source file and run it (for C/C++ as an example)
-// void compileAndRun(const QString &sourceFile, const QStringList &arguments,QProcess *process) {
-//     QString outputExecutable = "tempExecutable";
-// #ifdef Q_OS_WIN
-//     outputExecutable.append(".exe");
-// #endif
-//     // Adjust the compiler command and flags as needed
-//     QStringList compileArgs;
-//     compileArgs << sourceFile << "-o" << outputExecutable;
-//     process->start("gcc", compileArgs);
-//     if (!process->waitForFinished()) {
-//         qDebug() << "Compilation failed for:" << sourceFile;
-//         return;
-//     }
-//     qDebug() << "Compilation successful. Running executable...";
-//     QStringList execArgs = arguments.mid(1);  // exclude source file name
-//     launchProcess(outputExecutable, execArgs,process);
-// }
-
-// // Run a source file with an interpreter (for Python as an example)
-// void runWithInterpreter(const QString &sourceFile, const QStringList &arguments,QProcess *process) {
-//     process->setProgram("python");  // or "python3" depending on your system
-//     QStringList args;
-//     args << sourceFile;
-//     args << arguments.mid(1);  // Pass any extra arguments
-//     process->setArguments(args);
-//     process->start();
-//     if (!process->waitForStarted()) {
-//         qDebug() << "Failed to start interpreter for:" << sourceFile;
-//         delete process;
-//         return;
-//     }
-//     process->waitForFinished();
-//     qDebug() << "Interpreter output:" << process->readAllStandardOutput();
-//     delete process;
-// }
 
 
 // void pathFilesDirectory(const QStringList &tokens,QString qstrInput,QProcess *proces){
@@ -373,66 +282,35 @@ void ResponseWindow::executeManualImplementedCommand(const QStringList &tokens, 
     #endif
 
 
-
-
-
-
-        //windows built in
-    /*
-     * Directly Executable via cmd.exe:             DIR, ECHO, EXIT, FOR, PAUSE, PROMPT, SET, TIME, TITLE
-        Requires Manual Handling in Your Shell:         CD, CLS, COPY, DATE, DEL, MD, MOVE, PATH, RD, REN
-     *
-     *CD / CHDIR: Change the current directory.
-        CLS: Clear the screen.
-        COPY: Copy one or more files to another location.
-        DATE: Display or set the system date.
-        DEL / ERASE: Delete one or more files.
-        DIR: Display a list of files and subdirectories in a directory.
-        ECHO: Display messages, or turn command echoing on or off.
-        EXIT: Exit the command prompt or a batch script.
-        FOR: Loop through a set of files and run a command for each.
-        MD / MKDIR: Create a new directory.
-        MOVE: Move one or more files from one directory to another.
-        PATH: Display or set a search path for executable files.
-        PAUSE: Pause the execution of a batch file and show a message.
-        PROMPT: Change the command prompt.
-        RD / RMDIR: Remove a directory.
-        REN / RENAME: Rename a file or directory.
-        SET: Display, set, or remove environment variables.
-        TIME: Display or set the system time.
-        TITLE: Set the window title for the CMD session.
-     * */
-
-
-    //linux built in
-    /*
-     *
-     *alias: Define or display aliases.
-        bg: Resume suspended jobs in the background.
-        cd: Change the current directory.
-        echo: Display a line of text.
-        exit: Exit the shell.
-        fg: Bring a background job to the foreground.
-        history: Display or manipulate the command history.
-        jobs: List active jobs.
-        pwd: Print the working directory.
-        set: Set or unset shell options and positional parameters.
-        source (or .): Execute commands from a file in the current shell.
-        umask: Set the file mode creation mask.
-        unalias: Remove an alias.
-    * */
+    //Directly Executable via cmd.exe:             DIR, ECHO, EXIT, FOR, PAUSE, PROMPT, SET, TIME, TITLE
+    //Requires Manual Handling in Your Shell:         CD, CLS, COPY, DATE, DEL, MD, MOVE, PATH, RD, REN
 
 }
 
 // Run a command via the system shell if it is not recognized
-void runViaSystemShell(const QString &input,QProcess *process) {
-
+void runViaSystemShell(const QString &input, QProcess *process) {
 
     #ifdef Q_OS_WIN
-        process->execute("cmd.exe", QStringList() << "/c" << input);
+        process->setProgram("cmd.exe");
+        process->setArguments(QStringList() << "/c" << input);
     #else
-        process->execute("/bin/sh", QStringList() << "-c" << input);
+        process->setProgram("/bin/sh");
+        process->setArguments(QStringList() << "-c" << input);
     #endif
+
+    process->start(); // Run the command asynchronously
+
+    // if (!process->waitForStarted()) {
+    //     qDebug() << "Failed to start process!";
+    //     return;
+    // }
+
+    // process->waitForFinished();  // Optional: Wait for the command to finish
+
+    // qDebug() << "Command Output:\n" << process->readAllStandardOutput();
+    // qDebug() << "Command Error Output:\n" << process->readAllStandardError();
+
+
 
 
     //pass directly with cmd.exe
@@ -459,6 +337,171 @@ void runViaSystemShell(const QString &input,QProcess *process) {
      *
      * */
 
+}
+
+
+// Function to tokenize input (simple whitespace splitting)
+QStringList tokenizeInput(const QString &input) {
+    return input.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+}
+
+// Check if the given path exists
+bool ResponseWindow::fileExists(const QString &filePath) {
+    QFileInfo fileInfo(filePath);
+
+    QDir currentTabDir= pw->current_directory_map[pwTabIndex];
+
+    // If file path is absolute, check directly
+    if (fileInfo.isAbsolute()) {
+        return fileInfo.exists();
+    }
+
+    // If file path is relative, check inside the tab's directory
+    QString fullFilePath = currentTabDir.filePath(filePath);
+
+    return QFileInfo::exists(fullFilePath);
+}
+
+
+// Check if the file is executable
+bool isExecutable(const QString &filePath) {
+    QFileInfo fileInfo(filePath);
+
+    #ifdef Q_OS_WIN
+            // Windows: Check common executable extensions
+        static const QStringList executableExtensions = {
+            ".exe", ".bat", ".cmd", ".com", ".scr", ".msi", ".dll", ".ps1"
+        };
+
+        QString fileExt = fileInfo.suffix().toLower();
+        return executableExtensions.contains("." + fileExt);
+    #else
+        // Linux/macOS: Check if file has execute permission
+        return fileInfo.isExecutable(); //builtin to check executable linux/macos file
+    #endif
+}
+
+
+// Check if a file is a source code file
+bool isSourceFile(const QString &filePath) {
+    return filePath.endsWith(".c", Qt::CaseInsensitive) || //support of c
+           filePath.endsWith(".cpp", Qt::CaseInsensitive) || //support of c++
+           filePath.endsWith(".py", Qt::CaseInsensitive) || //support of python
+           filePath.endsWith(".java", Qt::CaseInsensitive); //support of java
+}
+
+// Determine if a source code file requires compilation
+bool needsCompilation(const QString &filePath) {
+    return filePath.endsWith(".c", Qt::CaseInsensitive) ||
+           filePath.endsWith(".cpp", Qt::CaseInsensitive);
+}
+
+// Launch an executable process
+void launchProcess(const QString command, const QStringList arguments, QProcess *process) {
+
+    process->setProgram(command);
+    process->setArguments(arguments);
+    process->start(); //start process and wait at from where this function has called
+
+    // if (!process.waitForStarted()) {
+    //     qDebug() << "Failed to start process:" << command;
+    //     return;
+    // }
+    // process.waitForFinished();
+    // qDebug() << "Process output:" << process.readAllStandardOutput();
+}
+
+// Compile the source file and run it (for C/C++)
+void compileAndRun(const QString sourceFile, const QStringList arguments, QProcess *process) {
+
+    QString outputExecutable = "tempExecutable";
+
+    #ifdef Q_OS_WIN
+        outputExecutable.append(".exe");
+    #endif
+        QString compiler = sourceFile.endsWith(".c", Qt::CaseInsensitive) ? "gcc" : "g++";
+
+        QStringList compileArgs;
+        compileArgs << sourceFile << "-o" << outputExecutable;
+
+        process->start(compiler, compileArgs);
+        if (!process->waitForFinished() || process->exitCode() != 0) {
+            qDebug() << "Compilation failed for:" << sourceFile;
+            qDebug() << "Compiler output:" << process->readAllStandardError();
+            return;
+        }
+        qDebug() << "Compilation successful. Running executable...";
+
+        QStringList execArgs = arguments.mid(1);
+        launchProcess(outputExecutable, execArgs, process);
+}
+
+// Compile and Run Java source file
+void compileAndRunJava(const QString sourceFile, const QStringList arguments, QProcess *process) {
+
+    if (!sourceFile.endsWith(".java", Qt::CaseInsensitive)) {
+        qDebug() << "Not a valid Java source file.";
+        return;
+    }
+
+    // Step 1: Compile Java file with javac
+    process->start("javac", QStringList() << sourceFile);
+    if (!process->waitForFinished() || process->exitCode() != 0) {
+        qDebug() << "Compilation failed for:" << sourceFile;
+        qDebug() << "Compiler output:" << process->readAllStandardError();
+        return;
+    }
+    qDebug() << "Compilation successful.";
+
+    // Extract class name from file (remove path & extension)
+    QString className = QFileInfo(sourceFile).baseName();
+
+    // Step 2: Run the Java class
+    QStringList execArgs;
+    execArgs << className;
+    execArgs.append(arguments.mid(1)); // Extra arguments
+
+    process->start("java", execArgs);
+
+    // if (!process.waitForStarted()) {
+    //     qDebug() << "Failed to start Java process for:" << className;
+    //     return;
+    // }
+    // process.waitForFinished();
+    // qDebug() << "Java Program Output:\n" << process.readAllStandardOutput();
+}
+
+
+
+// Run a source file with an interpreter (for Python)
+void runWithInterpreter(const QString &sourceFile, const QStringList &arguments, QProcess *process) {
+
+    // Determine available Python interpreter
+    QString pythonInterpreter = "python";
+
+    #ifdef Q_OS_UNIX
+        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+        if (env.contains("PYTHON")) {
+            pythonInterpreter = env.value("PYTHON");
+        } else if (QFileInfo("/usr/bin/python3").exists()) {
+            pythonInterpreter = "python3";
+        }
+    #endif
+
+        QStringList args;
+        args << sourceFile;
+        args << arguments.mid(1);
+
+        process->setProgram(pythonInterpreter);
+        process->setArguments(args);
+        process->start();
+
+        // if (!process.waitForStarted()) {
+        //     qDebug() << "Failed to start interpreter for:" << sourceFile;
+        //     return;
+        // }
+        // process.waitForFinished();
+        // qDebug() << "Interpreter output:" << process.readAllStandardOutput();
 }
 
 
@@ -490,10 +533,7 @@ void ResponseWindow::onInputEntered()
             return;
         }
 
-
-
         strInput=qstrInput.toStdString();
-
 
         //user input processing for correct execution
         QStringList tokens = tokenizeInput(qstrInput);
@@ -503,20 +543,30 @@ void ResponseWindow::onInputEntered()
         qDebug()<<"entered cmd: "<<tokens[0];
 
 
-        //next handle executable and source files
+        //veryfy running of .cpp .exe
 
-        // if(fileExists(command)) { //is file exists executable or source file
-        //     if(isExecutable(command)) {
-        //         launchProcess(command, tokens,process);
-        //     } else if (isSourceFile(command)) {
-        //         if(needsCompilation(command))
-        //             compileAndRun(command, tokens,process);
-        //         else
-        //             runWithInterpreter(command, tokens,process);
-        //     } else{
-        //         qDebug() << "File exists but is not recognized as executable or source code:" << command;
-        //     }
-        // } else {
+        //handling of executable-source-manaual-shell file and comands
+        if(fileExists(command)){ //is file exists executable or source file
+
+            if(isExecutable(command)) {
+                launchProcess(command, tokens,process); //executable file
+                qDebug()<<"exec file";
+            }
+            else if (isSourceFile(command)) {
+
+                if(command.endsWith(".java", Qt::CaseInsensitive))
+                    compileAndRun(command, tokens,process); //compliler source file : .java
+                else if(needsCompilation(command))
+                    compileAndRun(command, tokens,process); //compliler source file : .c .cpp
+                else
+                    runWithInterpreter(command, tokens,process); //interpreter src file : .py
+            }
+            else{
+                qDebug() << "File exists but is not recognized as executable or source code:" << command;
+            }
+        }
+        else {
+
             if(windows_shell_cmd_map.find(tokens[0].toStdString())!= windows_shell_cmd_map.end() ){
                 qDebug()<<"cd found in shell cmd map";
                 executeManualImplementedCommand(tokens,qstrInput,process);
@@ -528,18 +578,7 @@ void ResponseWindow::onInputEntered()
                 // Fallback: run via system shell
                 runViaSystemShell(qstrInput,process);
             }
-        // }
-
-
-        //testing cd cmd
-        // if(windows_shell_cmd_map.find(tokens[0].toStdString())!= windows_shell_cmd_map.end() ){
-        //     qDebug()<<"cd found in shell cmd map";
-        //     executeManualImplementedCommand(tokens,qstrInput,process);
-        //     //set the new response window after clearing all old
-        //     setNewResponseWindow();
-        //     return;
-        //     // Built-in command was executed
-        // }
+        }
 
 
         if(!process->waitForStarted()){
@@ -549,7 +588,7 @@ void ResponseWindow::onInputEntered()
         }
 
         if(!process->waitForFinished()){
-            ui->outputDisplayLabel->setText("Process is not yet Finished.");
+            ui->outputDisplayLabel->setText("Wait to be finished process!");
             process->deleteLater();
             return;
         }
@@ -558,7 +597,7 @@ void ResponseWindow::onInputEntered()
 
         qstrOutput=QString::fromUtf8(array); //convert to human readable
 
-        qstrOutput=qstrOutput.trimmed(); //trimming unnecessary chars
+        // qstrOutput=qstrOutput.trimmed(); //trimming unnecessary chars
         strOutput=qstrOutput.toStdString(); //converts to standard string
 
         //set output to display label
