@@ -1,11 +1,9 @@
 #include "responsewindow.h"
 #include "ui_responsewindow.h"
 
-
 #include<cstdlib>
 #include<string>
 #include <unordered_map>
-
 
 #include <QProcess>
 #include <QTextEdit>
@@ -30,6 +28,7 @@ ResponseWindow::ResponseWindow(ParentWindow *pwq,int tabIndex,QWidget *parent)
 
     ui->setupUi(this);
 
+        // same buil-in for both linux-windows
     windows_shell_cmd_map["cd"] = std::bind(&ResponseWindow::changeDirectory, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     windows_shell_cmd_map["clear"]=std::bind(&ResponseWindow::clearCurrentTab, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     windows_shell_cmd_map["copy"]=std::bind(&ResponseWindow::copyFileToFileData, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
@@ -37,12 +36,6 @@ ResponseWindow::ResponseWindow(ParentWindow *pwq,int tabIndex,QWidget *parent)
     windows_shell_cmd_map["del"]=std::bind(&ResponseWindow::deleteFiles, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     windows_shell_cmd_map["move"]=std::bind(&ResponseWindow::moveFiles, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 
-
-    //later write for these aslo
-    // windows_shell_cmd_map["MD"];
-    // windows_shell_cmd_map["RD"];
-    // windows_shell_cmd_map["REN"];
-    // windows_shell_cmd_map["PATH"];
 
 
     // //LINUX
@@ -52,7 +45,6 @@ ResponseWindow::ResponseWindow(ParentWindow *pwq,int tabIndex,QWidget *parent)
     // linux_shell_cmd_map["bg"];
     // linux_shell_cmd_map["fg"];
     // linux_shell_cmd_map["source"];
-
 
 
     //connect for getting input when user press enter after writing input
@@ -92,7 +84,6 @@ void ResponseWindow::setCurrentDirectory(int tabIndex){
     }
 }
 
-
 //it create new window of response window
 void ResponseWindow::setNewResponseWindow() {
     if(!pw){
@@ -105,35 +96,6 @@ void ResponseWindow::setNewResponseWindow() {
         pw->addResponseWindowToTab(pwTabIndex);
     }
 }
-
-
-// // Check if a command is a Windows shell built-in
-// bool isShellBuiltinWindows(const std::string& command) {
-//     std::string cmd = "cmd /c \"ver >nul && " + command + " 2>nul\"";
-//     return (system(cmd.c_str()) == 0);
-// }
-
-// // Check if a command is an executable file in Windows
-// bool isExecutableFileWindows(const std::string& command) {
-//     std::string cmd = "where " + command + " >nul 2>&1";
-//     return (system(cmd.c_str()) == 0);
-// }
-
-// // Check if a command is a Linux shell built-in
-// bool isShellBuiltinLinux(const std::string& command) {
-//     std::string cmd = "type " + command + " 2>/dev/null | grep -q 'builtin'";
-//     return (system(cmd.c_str()) == 0);
-// }
-
-// // Check if a command is an executable file in Linux
-// bool isExecutableFileLinux(const std::string& command) {
-//     std::string cmd = "which " + command + " > /dev/null 2>&1";
-//     return (system(cmd.c_str()) == 0);
-// }
-
-
-
-
 
 
 // void pathFilesDirectory(const QStringList &tokens,QString qstrInput,QProcess *proces){
@@ -251,9 +213,12 @@ void ResponseWindow::changeDirectory(const QStringList &tokens, QString qstrInpu
 
     if(dir.cd(targetPath)) {
         pw->current_directory_map[pwTabIndex] = dir.canonicalPath();
+        //set current path to directory also otherwise it won't reflect actually
+        dir.setCurrent(dir.canonicalPath());
         ui->outputDisplayLabel->setText("Directory : "+dir.canonicalPath());
     }
     else{
+        dir.setCurrent(dir.absoluteFilePath(tokens[1]));
         ui->outputDisplayLabel->setText(targetPath);
     }
 }
@@ -288,7 +253,7 @@ void ResponseWindow::executeManualImplementedCommand(const QStringList &tokens, 
 }
 
 // Run a command via the system shell if it is not recognized
-void runViaSystemShell(const QString &input, QProcess *process) {
+QByteArray runViaSystemShell(const QString &input, QProcess *process) {
 
     #ifdef Q_OS_WIN
         process->setProgram("cmd.exe");
@@ -300,18 +265,17 @@ void runViaSystemShell(const QString &input, QProcess *process) {
 
     process->start(); // Run the command asynchronously
 
-    // if (!process->waitForStarted()) {
-    //     qDebug() << "Failed to start process!";
-    //     return;
-    // }
+    if (!process->waitForFinished() || process->waitForFinished()!=0) {
+        qDebug() << "Failed to start process!";
+        return "Failed to start process!"+process->readAllStandardError();
+    }
 
     // process->waitForFinished();  // Optional: Wait for the command to finish
 
-    // qDebug() << "Command Output:\n" << process->readAllStandardOutput();
-    // qDebug() << "Command Error Output:\n" << process->readAllStandardError();
+    qDebug() << "Command Output:\n" << process->readAllStandardOutput();
+    qDebug() << "Command Error Output:\n" << process->readAllStandardError();
 
-
-
+    return "Program Output:"+process->readAllStandardOutput();
 
     //pass directly with cmd.exe
     /*
@@ -368,16 +332,25 @@ bool isExecutable(const QString &filePath) {
     QFileInfo fileInfo(filePath);
 
     #ifdef Q_OS_WIN
-            // Windows: Check common executable extensions
         static const QStringList executableExtensions = {
-            ".exe", ".bat", ".cmd", ".com", ".scr", ".msi", ".dll", ".ps1"
+            ".exe", ".bat", ".cmd", ".com", ".scr", ".msi", ".ps1"
         };
 
-        QString fileExt = fileInfo.suffix().toLower();
-        return executableExtensions.contains("." + fileExt);
+        QString ext = "." + fileInfo.suffix().toLower();
+        if (fileInfo.exists() && executableExtensions.contains(ext)) {
+            return true;
+        }
+
+        for (const QString &extension : executableExtensions) {
+            QFileInfo withExt(filePath + extension);
+            if (withExt.exists())
+                return true;
+        }
+
+        return false;
     #else
-        // Linux/macOS: Check if file has execute permission
         return fileInfo.isExecutable(); //builtin to check executable linux/macos file
+        // Linux/macOS: Check if file has execute permission for: ls,grep,cat
     #endif
 }
 
@@ -397,51 +370,71 @@ bool needsCompilation(const QString &filePath) {
 }
 
 // Launch an executable process
-void launchProcess(const QString command, const QStringList arguments, QProcess *process) {
+QByteArray launchProcess(const QString program, const QStringList args, QProcess *process) {
 
-    process->setProgram(command);
-    process->setArguments(arguments);
-    process->start(); //start process and wait at from where this function has called
+    process->start(program, args);
 
-    // if (!process.waitForStarted()) {
-    //     qDebug() << "Failed to start process:" << command;
-    //     return;
-    // }
-    // process.waitForFinished();
-    // qDebug() << "Process output:" << process.readAllStandardOutput();
+    if (!process->waitForStarted()) {
+        qDebug() << "Failed to run program:" << program;
+        return "Failed to run program:";
+    }
+
+    process->waitForFinished();
+
+    QByteArray output = process->readAllStandardOutput();
+    QByteArray errors = process->readAllStandardError();
+
+    qDebug() << "Program Output:\n" << output;
+    if (!errors.isEmpty()) {
+        qDebug() << "Program Errors:\n" << errors;
+        return errors;
+    }
+
+    return output;
 }
 
-// Compile the source file and run it (for C/C++)
-void compileAndRun(const QString sourceFile, const QStringList arguments, QProcess *process) {
+// Compile and run C/C++ source file with arguments
+QByteArray compileAndRun(const QString &sourceFile, const QStringList &arguments, QProcess *process) {
+    // Validate input
+    if (!sourceFile.endsWith(".c", Qt::CaseInsensitive) &&
+        !sourceFile.endsWith(".cpp", Qt::CaseInsensitive)) {
+        qDebug() << "Not a valid C/C++ source file.";
+        return "Not a valid C/C++ source file.";
+    }
 
-    QString outputExecutable = "tempExecutable";
+    // Choose compiler based on extension
+    QString compiler = sourceFile.endsWith(".c", Qt::CaseInsensitive) ? "gcc" : "g++";
 
+    // Use unique temp executable name to avoid overwrite
+    QString outputExecutable = "tempExecutable_" +
+                               QString::number(QDateTime::currentMSecsSinceEpoch());
     #ifdef Q_OS_WIN
-        outputExecutable.append(".exe");
+    outputExecutable.append(".exe"); //it is not required for windows
     #endif
-        QString compiler = sourceFile.endsWith(".c", Qt::CaseInsensitive) ? "gcc" : "g++";
 
-        QStringList compileArgs;
-        compileArgs << sourceFile << "-o" << outputExecutable;
+    // Step 1: Compile
+    QStringList compileArgs;
+    compileArgs << sourceFile << "-o" << outputExecutable;
 
-        process->start(compiler, compileArgs);
-        if (!process->waitForFinished() || process->exitCode() != 0) {
-            qDebug() << "Compilation failed for:" << sourceFile;
-            qDebug() << "Compiler output:" << process->readAllStandardError();
-            return;
-        }
-        qDebug() << "Compilation successful. Running executable...";
+    process->start(compiler, compileArgs);
+    if (!process->waitForFinished() || process->exitCode() != 0) {
+        qDebug() << "Compilation failed for:" << sourceFile;
+        qDebug() << "Compiler errors:\n" << process->readAllStandardError();
+        return "Compilation failed Eroor:"+process->readAllStandardError();
+    }
+    qDebug() << "Compilation successful. Running:" << outputExecutable;
 
-        QStringList execArgs = arguments.mid(1);
-        launchProcess(outputExecutable, execArgs, process);
+    // Step 2: Run the executable
+    QStringList execArgs = arguments.mid(1); // Skip sourceFile if it was at index 0
+    return launchProcess(outputExecutable, execArgs, process);
 }
 
 // Compile and Run Java source file
-void compileAndRunJava(const QString sourceFile, const QStringList arguments, QProcess *process) {
+QByteArray compileAndRunJava(const QString sourceFile, const QStringList arguments, QProcess *process) {
 
     if (!sourceFile.endsWith(".java", Qt::CaseInsensitive)) {
         qDebug() << "Not a valid Java source file.";
-        return;
+        return "Not a valid Java source file.";
     }
 
     // Step 1: Compile Java file with javac
@@ -449,7 +442,7 @@ void compileAndRunJava(const QString sourceFile, const QStringList arguments, QP
     if (!process->waitForFinished() || process->exitCode() != 0) {
         qDebug() << "Compilation failed for:" << sourceFile;
         qDebug() << "Compiler output:" << process->readAllStandardError();
-        return;
+        return "Compiler output:"+ process->readAllStandardError();
     }
     qDebug() << "Compilation successful.";
 
@@ -458,23 +451,24 @@ void compileAndRunJava(const QString sourceFile, const QStringList arguments, QP
 
     // Step 2: Run the Java class
     QStringList execArgs;
+    //find the class name and to arglist and args are passed by the time of compiling
     execArgs << className;
     execArgs.append(arguments.mid(1)); // Extra arguments
 
     process->start("java", execArgs);
 
-    // if (!process.waitForStarted()) {
-    //     qDebug() << "Failed to start Java process for:" << className;
-    //     return;
-    // }
-    // process.waitForFinished();
-    // qDebug() << "Java Program Output:\n" << process.readAllStandardOutput();
+    if (!process->waitForFinished() || process->exitCode() != 0) {
+        qDebug() << "fialed running output:" << process->readAllStandardError();
+        return "Runtime Failed:"+ process->readAllStandardError();
+    }
+
+    return "Program Output:"+process->readAllStandardOutput();
 }
 
 
 
 // Run a source file with an interpreter (for Python)
-void runWithInterpreter(const QString &sourceFile, const QStringList &arguments, QProcess *process) {
+QByteArray runWithInterpreter(const QString &sourceFile, const QStringList &arguments, QProcess *process) {
 
     // Determine available Python interpreter
     QString pythonInterpreter = "python";
@@ -496,12 +490,12 @@ void runWithInterpreter(const QString &sourceFile, const QStringList &arguments,
         process->setArguments(args);
         process->start();
 
-        // if (!process.waitForStarted()) {
-        //     qDebug() << "Failed to start interpreter for:" << sourceFile;
-        //     return;
-        // }
-        // process.waitForFinished();
-        // qDebug() << "Interpreter output:" << process.readAllStandardOutput();
+        if (!process->waitForFinished() || process->waitForFinished()!=0) {
+            qDebug() << "Failed to start interpreter for:" << sourceFile;
+            return "Failed to start interpreter.";
+        }
+        qDebug()<<"Interpreter output:" << process->readAllStandardOutput();
+        return "Program output:"+ process->readAllStandardOutput();
 }
 
 
@@ -538,28 +532,28 @@ void ResponseWindow::onInputEntered()
         //user input processing for correct execution
         QStringList tokens = tokenizeInput(qstrInput);
         QString command = tokens[0];
-        QProcess *process=new QProcess(this);
+        QProcess *process=new QProcess(this);//unix(fork-execvp)- windows(createProcess)
 
         qDebug()<<"entered cmd: "<<tokens[0];
 
 
         //veryfy running of .cpp .exe
-
+        QByteArray array;
         //handling of executable-source-manaual-shell file and comands
         if(fileExists(command)){ //is file exists executable or source file
 
             if(isExecutable(command)) {
-                launchProcess(command, tokens,process); //executable file
-                qDebug()<<"exec file";
+                array=launchProcess(command, tokens,process); //executable file
+                qDebug()<<"exec file";// executable file passed by creating new process
             }
             else if (isSourceFile(command)) {
 
                 if(command.endsWith(".java", Qt::CaseInsensitive))
-                    compileAndRun(command, tokens,process); //compliler source file : .java
+                    array=compileAndRunJava(command, tokens,process); //compliler source file : .java
                 else if(needsCompilation(command))
-                    compileAndRun(command, tokens,process); //compliler source file : .c .cpp
+                    array=compileAndRun(command, tokens,process); //compliler source file : .c .cpp
                 else
-                    runWithInterpreter(command, tokens,process); //interpreter src file : .py
+                    array=runWithInterpreter(command, tokens,process); //interpreter src file : .py
             }
             else{
                 qDebug() << "File exists but is not recognized as executable or source code:" << command;
@@ -567,11 +561,13 @@ void ResponseWindow::onInputEntered()
         }
         else {
 
+            //for both linux-windows same built-in beacause of internal management
             if(windows_shell_cmd_map.find(tokens[0].toStdString())!= windows_shell_cmd_map.end() ){
                 qDebug()<<"cd found in shell cmd map";
                 executeManualImplementedCommand(tokens,qstrInput,process);
-                setNewResponseWindow(); //set the new response window after clearing all old
-                return;
+
+                // setNewResponseWindow(); //set the new response window after clearing all old
+                // return;
                 // Built-in command was executed
             }
             else{
@@ -581,19 +577,21 @@ void ResponseWindow::onInputEntered()
         }
 
 
-        if(!process->waitForStarted()){
-            ui->outputDisplayLabel->setText("Process Creation faild.");
-            process->deleteLater();
-            return;
-        }
+        // if(!process->waitForStarted()){
+        //     ui->outputDisplayLabel->setText("Process Creation faild.");
+        //     setNewResponseWindow();
+        //     process->deleteLater();
+        //     return;
+        // }
 
-        if(!process->waitForFinished()){
-            ui->outputDisplayLabel->setText("Wait to be finished process!");
-            process->deleteLater();
-            return;
-        }
+        // if(!process->waitForFinished()){
+        //     ui->outputDisplayLabel->setText("Wait to be finished process!");
+        //     setNewResponseWindow();
+        //     process->deleteLater();
+        //     return;
+        // }
 
-        QByteArray array=process->readAllStandardOutput();
+        // QByteArray array=process->readAllStandardOutput();
 
         qstrOutput=QString::fromUtf8(array); //convert to human readable
 
@@ -603,8 +601,8 @@ void ResponseWindow::onInputEntered()
         //set output to display label
         ui->outputDisplayLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum); //vertically can expand
 
-        if(qstrOutput.isEmpty())
-            ui->outputDisplayLabel->setText("Sorry,output does not found");
+        if(qstrOutput.isEmpty()){}
+            // ui->outputDisplayLabel->setText("Sorry,output does not found");
         else
             ui->outputDisplayLabel->setText(qstrOutput); //sets content to label
 

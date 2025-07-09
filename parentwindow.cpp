@@ -15,7 +15,7 @@ ParentWindow::ParentWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::ParentWindow)
 {
-    ui->setupUi(this);
+    ui->setupUi(this); //pass calling reference object
 
     //creates new tab with respoonse window on startup of app
 
@@ -35,6 +35,7 @@ ParentWindow::ParentWindow(QWidget *parent)
     this->addResponseWindowToTab(ui->parentTabContainer->count());
 }
 
+//destructor
 ParentWindow::~ParentWindow()
 {
     delete ui;
