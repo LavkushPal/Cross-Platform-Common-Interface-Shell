@@ -271,11 +271,14 @@ QByteArray runViaSystemShell(const QString &input, QProcess *process) {
     }
 
     // process->waitForFinished();  // Optional: Wait for the command to finish
+    QByteArray res=process->readAllStandardOutput();
+    if(res.isEmpty())
+        res=process->readAllStandardError();
 
-    qDebug() << "Command Output:\n" << process->readAllStandardOutput();
-    qDebug() << "Command Error Output:\n" << process->readAllStandardError();
+    qDebug() << "Command Output:\n" << res;
+    qDebug() << "Command Error Output:\n" << res;
 
-    return "Program Output:"+process->readAllStandardOutput();
+    return "Program Output: "+res;
 
     //pass directly with cmd.exe
     /*
@@ -499,6 +502,118 @@ QByteArray runWithInterpreter(const QString &sourceFile, const QStringList &argu
 }
 
 
+// checking characters
+bool containsRedirectionOrPipe(const QString& input) {
+    return input.contains('|') || input.contains('>') || input.contains('<');
+}
+
+//node for pipe-redirection input output
+struct ParsedCommand {
+    QStringList pipelineCommands;  // e.g., ["cat file.txt", "grep hello"]
+    QString outputFile;
+    QString inputFile;
+    bool append = false;
+};
+
+//checking is redirection- piping used or not
+ParsedCommand parseCommandWithIO(const QString& input) {
+    ParsedCommand parsed;
+
+    QString cmd = input;
+    // Handle output redirection (>, >>)
+    if (cmd.contains(">>")) {
+        QStringList parts = cmd.split(">>");
+        cmd = parts[0].trimmed();
+        parsed.outputFile = parts[1].trimmed();
+        parsed.append = true;
+    } else if (cmd.contains(">")) {
+        QStringList parts = cmd.split(">");
+        cmd = parts[0].trimmed();
+        parsed.outputFile = parts[1].trimmed();
+    }
+
+    // Handle input redirection (<)
+    if (cmd.contains("<")) {
+        QStringList parts = cmd.split("<");
+        cmd = parts[0].trimmed();
+        parsed.inputFile = parts[1].trimmed();
+    }
+
+    // Split by pipes
+    parsed.pipelineCommands = cmd.split("|", Qt::SkipEmptyParts);
+    for (QString& part : parsed.pipelineCommands)
+        part = part.trimmed();
+
+    return parsed;
+}
+
+// handeling Redirection and Piping
+QByteArray executePipeline(const ParsedCommand& parsed) {
+    QByteArray pipeInput;
+    QByteArray pipeOutput;
+
+    qDebug()<<"pipeline hit";
+
+    // Handle input redirection (<::input >::output >>::output with append in file) (piping::|)
+    if (!parsed.inputFile.isEmpty()) {
+        qDebug()<<"input:"<<parsed.inputFile;
+
+        QFile infile(parsed.inputFile);
+        if (infile.open(QIODevice::ReadOnly))
+            pipeInput = infile.readAll();
+    }
+
+    for (int i = 0; i < parsed.pipelineCommands.size(); ++i) {
+        QString commandLine = parsed.pipelineCommands[i];
+        QStringList tokens = QProcess::splitCommand(commandLine);
+        QString program = tokens.takeFirst();
+
+        QProcess process;
+        process.setProcessChannelMode(QProcess::MergedChannels);
+        // process.start(program, tokens);
+
+        #ifdef Q_OS_WIN
+                QString fullCmd = program + " " + tokens.join(" ");
+                process.start("cmd", QStringList() << "/c" << fullCmd);
+        #else
+                QString fullCmd = program + " " + tokens.join(" ");
+                process.start("bash", QStringList() << "-c" << fullCmd);
+        #endif
+
+
+        // Send previous output as input
+        if (!pipeInput.isEmpty()) {
+            process.write(pipeInput);
+            process.closeWriteChannel();
+        }
+
+        process.waitForFinished();
+        pipeInput = process.readAllStandardOutput(); // For next stage
+    }
+
+    pipeOutput = pipeInput;
+
+    // Output redirection
+    if (!parsed.outputFile.isEmpty()) {
+        QFile file(parsed.outputFile);
+        QIODevice::OpenMode mode = QIODevice::WriteOnly | QIODevice::Text;
+        if (parsed.append)
+            mode |= QIODevice::Append;
+
+        if (file.open(mode)) {
+            file.write(pipeOutput);
+            file.close();
+        }
+    }
+
+    qDebug()<<pipeOutput;
+
+    return pipeOutput;
+}
+
+
+
+
 void ResponseWindow::onInputEntered()
 {
         string strInput;
@@ -539,8 +654,15 @@ void ResponseWindow::onInputEntered()
 
         //veryfy running of .cpp .exe
         QByteArray array;
+
+        //handle piping-redirection in 3-phases
+        if(containsRedirectionOrPipe(qstrInput)) {
+            ParsedCommand parsed = parseCommandWithIO(qstrInput);
+            array = executePipeline(parsed);
+            qDebug() << "Pipeline Output:\n" << array;
+        }
         //handling of executable-source-manaual-shell file and comands
-        if(fileExists(command)){ //is file exists executable or source file
+        else if(fileExists(command)){ //is file exists executable or source file
 
             if(isExecutable(command)) {
                 array=launchProcess(command, tokens,process); //executable file
@@ -560,7 +682,6 @@ void ResponseWindow::onInputEntered()
             }
         }
         else {
-
             //for both linux-windows same built-in beacause of internal management
             if(windows_shell_cmd_map.find(tokens[0].toStdString())!= windows_shell_cmd_map.end() ){
                 qDebug()<<"cd found in shell cmd map";
@@ -572,7 +693,7 @@ void ResponseWindow::onInputEntered()
             }
             else{
                 // Fallback: run via system shell
-                runViaSystemShell(qstrInput,process);
+                array=runViaSystemShell(qstrInput,process);
             }
         }
 
