@@ -44,7 +44,8 @@ class ResponseWindow : public QWidget {
         void deleteFiles(const QStringList &,QString,QProcess *);
         void moveFiles(const QStringList &,QString,QProcess *);
         bool fileExists(const QString &);
-
+        void listBackgroundJobs(const QStringList &tokens);
+        // QByteArray launchProcess(ResponseWindow* owner, const QString& program, const QStringList& args, QProcess* process, bool isBackground =);
 
     private:
         Ui::ResponseWindow *ui;

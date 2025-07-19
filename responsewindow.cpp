@@ -1,6 +1,8 @@
 #include "responsewindow.h"
 #include "ui_responsewindow.h"
 
+#include <QtConcurrent/QtConcurrent>
+
 #include<cstdlib>
 #include<string>
 #include <unordered_map>
@@ -19,6 +21,22 @@
 using namespace std;
 
 #define DIRECTORY_SHOW_LABEL_LENGTH 30
+
+
+//global declaration for shell-defined job table
+struct Job {
+    int id;
+    QProcess* process;
+    QString command;
+    bool isRunning;
+    QString output;  // <-- new field to store output
+};
+
+
+QVector<Job> jobTable;
+int nextJobId = 1;
+
+
 
 //constructor
 ResponseWindow::ResponseWindow(ParentWindow *pwq,int tabIndex,QWidget *parent)
@@ -223,6 +241,35 @@ void ResponseWindow::changeDirectory(const QStringList &tokens, QString qstrInpu
     }
 }
 
+void ResponseWindow::listBackgroundJobs(const QStringList &tokens) {
+    QString displayText;
+
+    bool showOutput = (tokens.length() > 1);
+
+    for (const Job& job : jobTable) {
+        QString status = job.isRunning ? "Running" : "Done";
+        qDebug() << "[" << job.id << "] " << status << "\t" << job.command;
+
+        QString jobLine = QString("[%1] %2\t%3\n")
+                              .arg(job.id)
+                              .arg(status)
+                              .arg(job.command);
+
+        qDebug() << jobLine;
+        displayText += jobLine;  // accumulate all jobs
+
+        if (showOutput && !job.output.isEmpty()) {
+            qDebug() << "Output:\n" << job.output;
+            displayText+= "Output: "+job.output;
+        }
+    }
+
+    if(displayText.isEmpty())
+        ui->outputDisplayLabel->setText("   No Jobs running in background!");
+    else
+        ui->outputDisplayLabel->setText(displayText.trimmed());
+}
+
 
 // Dummy built-in command handler
 void ResponseWindow::executeManualImplementedCommand(const QStringList &tokens, QString qstrInput, QProcess *process) {
@@ -235,13 +282,23 @@ void ResponseWindow::executeManualImplementedCommand(const QStringList &tokens, 
         // Check if the command exists before accessing it
         if (this->windows_shell_cmd_map.find(str) != this->windows_shell_cmd_map.end()) {
             this->windows_shell_cmd_map.at(str)(tokens, qstrInput, process); // Call appropriate function
-        } else {
+        }
+        else if (tokens[0] == "jobs") {
+            listBackgroundJobs(tokens);
+            return;
+        }
+        else {
             ui->outputDisplayLabel->setText("Error: Command not found in windows!");
         }
     #else
         if (linux_shell_cmd_map.find(str) != linux_shell_cmd_map.end()) {
             linux_shell_cmd_map[str](tokens, qstrInput, process); // Call appropriate function
-        } else {
+        }
+        else if (tokens[0] == "jobs") {
+            listBackgroundJobs(const QStringList &tokens);
+            return;
+        }
+        else {
             ui->outputDisplayLabel->setText("Error: Command not found in linux!");
         }
     #endif
@@ -336,7 +393,7 @@ bool isExecutable(const QString &filePath) {
 
     #ifdef Q_OS_WIN
         static const QStringList executableExtensions = {
-            ".exe", ".bat", ".cmd", ".com", ".scr", ".msi", ".ps1"
+            ".exe", ".bat", ".cmd", ".com", ".scr", ".msi", ".ps1","cmd"
         };
 
         QString ext = "." + fileInfo.suffix().toLower();
@@ -373,31 +430,78 @@ bool needsCompilation(const QString &filePath) {
 }
 
 // Launch an executable process
-QByteArray launchProcess(const QString program, const QStringList args, QProcess *process) {
+// QByteArray launchProcess(const QString program, const QStringList args, QProcess *process) {
 
-    process->start(program, args);
+//     process->start(program, args);
+
+//     if (!process->waitForStarted()) {
+//         qDebug() << "Failed to run program:" << program;
+//         return "Failed to run program:";
+//     }
+
+//     process->waitForFinished();
+
+//     QByteArray output = process->readAllStandardOutput();
+//     QByteArray errors = process->readAllStandardError();
+
+//     qDebug() << "Program Output:\n" << output;
+//     if (!errors.isEmpty()) {
+//         qDebug() << "Program Errors:\n" << errors;
+//         return errors;
+//     }
+
+//     return output;
+// }
+
+// launch executable processes by running in background if so
+QByteArray launchProcess(ResponseWindow* owner, const QString& program, const QStringList& args, QProcess* process, bool isBackground = false){
+    process->setProgram(program);
+    process->setArguments(args);
+    process->setProcessChannelMode(QProcess::MergedChannels);
+    process->start();
 
     if (!process->waitForStarted()) {
-        qDebug() << "Failed to run program:" << program;
-        return "Failed to run program:";
+        qDebug() << "Failed to run:" << program;
+        return "Failed to start process.";
     }
 
-    process->waitForFinished();
+    if (isBackground) {
+        Job job = { nextJobId++, process, program + " " + args.join(" "), true, "" };
+        jobTable.append(job);
 
-    QByteArray output = process->readAllStandardOutput();
-    QByteArray errors = process->readAllStandardError();
+        qDebug() << "[" << job.id << "] Running in background:" << job.command;
 
-    qDebug() << "Program Output:\n" << output;
-    if (!errors.isEmpty()) {
-        qDebug() << "Program Errors:\n" << errors;
-        return errors;
+        QObject::connect(process, &QProcess::finished, owner, [owner, process](...) {
+            for (Job& job : jobTable) {
+                if (job.process == process) {
+                    job.isRunning = false;
+
+                    QByteArray output = process->readAllStandardOutput();
+                    QByteArray error = process->readAllStandardError();
+
+                    job.output = output + error;
+
+                    qDebug() << "[" << job.id << "] Done\t" << job.command;
+
+                    break;
+                }
+            }
+            process->deleteLater();
+        });
+
+        return QString("Started in background: [%1] %2").arg(job.id).arg(program).toUtf8();
+    } else {
+        process->waitForFinished();
+        QByteArray output = process->readAllStandardOutput();
+        QByteArray error = process->readAllStandardError();
+        return output + error;
     }
-
-    return output;
 }
 
+
+
 // Compile and run C/C++ source file with arguments
-QByteArray compileAndRun(const QString &sourceFile, const QStringList &arguments, QProcess *process) {
+QByteArray compileAndRun(const QString &sourceFile, const QStringList &arguments, QProcess *process,ResponseWindow* owner,bool isBackground) {
     // Validate input
     if (!sourceFile.endsWith(".c", Qt::CaseInsensitive) &&
         !sourceFile.endsWith(".cpp", Qt::CaseInsensitive)) {
@@ -429,7 +533,13 @@ QByteArray compileAndRun(const QString &sourceFile, const QStringList &arguments
 
     // Step 2: Run the executable
     QStringList execArgs = arguments.mid(1); // Skip sourceFile if it was at index 0
-    return launchProcess(outputExecutable, execArgs, process);
+
+    QByteArray final_Result=launchProcess (owner,outputExecutable, execArgs, process,isBackground);
+
+    //added to remove object file after running the cpp c file
+    QFile::remove(outputExecutable);
+
+    return final_Result;
 }
 
 // Compile and Run Java source file
@@ -504,7 +614,7 @@ QByteArray runWithInterpreter(const QString &sourceFile, const QStringList &argu
 
 // checking characters
 bool containsRedirectionOrPipe(const QString& input) {
-    return input.contains('|') || input.contains('>') || input.contains('<');
+    return input.contains('&') || input.contains('|') || input.contains('>') || input.contains('<');
 }
 
 //node for pipe-redirection input output
@@ -516,11 +626,18 @@ struct ParsedCommand {
 };
 
 //checking is redirection- piping used or not
-ParsedCommand parseCommandWithIO(const QString& input) {
+ParsedCommand parseCommandWithIO(const QString& input, bool &isBackground) {
     ParsedCommand parsed;
+    QString cmd = input.trimmed();
 
-    QString cmd = input;
-    // Handle output redirection (>, >>)
+    // Detect background execution (&)
+    if (cmd.endsWith("&")) {
+        isBackground = true;
+        cmd.chop(1); // remove '&'
+        cmd = cmd.trimmed();
+    }
+
+    // Handle output redirection
     if (cmd.contains(">>")) {
         QStringList parts = cmd.split(">>");
         cmd = parts[0].trimmed();
@@ -532,87 +649,86 @@ ParsedCommand parseCommandWithIO(const QString& input) {
         parsed.outputFile = parts[1].trimmed();
     }
 
-    // Handle input redirection (<)
+    // Handle input redirection
     if (cmd.contains("<")) {
         QStringList parts = cmd.split("<");
         cmd = parts[0].trimmed();
         parsed.inputFile = parts[1].trimmed();
     }
 
-    // Split by pipes
+    // Handle pipes
     parsed.pipelineCommands = cmd.split("|", Qt::SkipEmptyParts);
-    for (QString& part : parsed.pipelineCommands)
+    for (QString &part : parsed.pipelineCommands)
         part = part.trimmed();
 
     return parsed;
 }
 
-// handeling Redirection and Piping
-QByteArray executePipeline(const ParsedCommand& parsed) {
-    QByteArray pipeInput;
-    QByteArray pipeOutput;
 
-    qDebug()<<"pipeline hit";
+QByteArray executePipeline(const ParsedCommand& parsed, bool isBackground) {
+    QList<QProcess*> processes;
+    QStringList commands = parsed.pipelineCommands;
+    int n = commands.size();
 
-    // Handle input redirection (<::input >::output >>::output with append in file) (piping::|)
+    QByteArray finalOutput;
+    QString fullPipelineCommand = commands.join(" | ");
+
+    // Handle input/output redirection
     if (!parsed.inputFile.isEmpty()) {
-        qDebug()<<"input:"<<parsed.inputFile;
-
-        QFile infile(parsed.inputFile);
-        if (infile.open(QIODevice::ReadOnly))
-            pipeInput = infile.readAll();
+        fullPipelineCommand = QString("cat %1 | %2").arg(parsed.inputFile, fullPipelineCommand);
     }
 
-    for (int i = 0; i < parsed.pipelineCommands.size(); ++i) {
-        QString commandLine = parsed.pipelineCommands[i];
-        QStringList tokens = QProcess::splitCommand(commandLine);
-        QString program = tokens.takeFirst();
-
-        QProcess process;
-        process.setProcessChannelMode(QProcess::MergedChannels);
-        // process.start(program, tokens);
-
-        #ifdef Q_OS_WIN
-                QString fullCmd = program + " " + tokens.join(" ");
-                process.start("cmd", QStringList() << "/c" << fullCmd);
-        #else
-                QString fullCmd = program + " " + tokens.join(" ");
-                process.start("bash", QStringList() << "-c" << fullCmd);
-        #endif
-
-
-        // Send previous output as input
-        if (!pipeInput.isEmpty()) {
-            process.write(pipeInput);
-            process.closeWriteChannel();
-        }
-
-        process.waitForFinished();
-        pipeInput = process.readAllStandardOutput(); // For next stage
-    }
-
-    pipeOutput = pipeInput;
-
-    // Output redirection
     if (!parsed.outputFile.isEmpty()) {
-        QFile file(parsed.outputFile);
-        QIODevice::OpenMode mode = QIODevice::WriteOnly | QIODevice::Text;
         if (parsed.append)
-            mode |= QIODevice::Append;
-
-        if (file.open(mode)) {
-            file.write(pipeOutput);
-            file.close();
-        }
+            fullPipelineCommand += QString(" >> %1").arg(parsed.outputFile);
+        else
+            fullPipelineCommand += QString(" > %1").arg(parsed.outputFile);
     }
 
-    qDebug()<<pipeOutput;
+    QProcess* process = new QProcess();
 
-    return pipeOutput;
+    #ifdef Q_OS_WIN
+        process->start("cmd", QStringList() << "/c" << fullPipelineCommand);
+    #else
+        process->start("bash", QStringList() << "-c" << fullPipelineCommand);
+    #endif
+
+    if (isBackground) {
+        Job job;
+        job.id = nextJobId++;
+        job.command = fullPipelineCommand;
+        job.process = process;
+        job.isRunning = true;
+
+        QObject::connect(process, &QProcess::finished, process, [=]() mutable {
+            QByteArray output = process->readAllStandardOutput();
+            QByteArray error = process->readAllStandardError();
+
+            for (Job& jb : jobTable) {
+                if (jb.id == job.id) {
+                    jb.output = output + error;
+                    jb.isRunning = false;
+                    qDebug() << "[" << jb.id << "] Done\t" << jb.command;
+                    break;
+                }
+            }
+
+            process->deleteLater();
+        });
+
+        jobTable.append(job);
+        qDebug() << "[" << job.id << "] Running in background:" << job.command;
+        return QString("Started in background: [%1] %2")
+            .arg(job.id).arg(job.command).toUtf8();
+    } else {
+        process->waitForFinished();
+
+        finalOutput += process->readAllStandardOutput();
+        finalOutput += process->readAllStandardError();
+        process->deleteLater();
+        return finalOutput;
+    }
 }
-
-
-
 
 void ResponseWindow::onInputEntered()
 {
@@ -651,29 +767,40 @@ void ResponseWindow::onInputEntered()
 
         qDebug()<<"entered cmd: "<<tokens[0];
 
+        bool isBackground = false;
+        if (!tokens.isEmpty() && tokens.last() == "&") { //detect for running in background
+            isBackground = true;
+            tokens.removeLast();
+        }
 
         //veryfy running of .cpp .exe
         QByteArray array;
 
-        //handle piping-redirection in 3-phases
-        if(containsRedirectionOrPipe(qstrInput)) {
-            ParsedCommand parsed = parseCommandWithIO(qstrInput);
-            array = executePipeline(parsed);
-            qDebug() << "Pipeline Output:\n" << array;
+        //handle piping-redirection-background all 3 handleleing
+        if (containsRedirectionOrPipe(qstrInput)) {
+            ParsedCommand parsed = parseCommandWithIO(qstrInput, isBackground);
+
+            array = executePipeline(parsed,isBackground);
+
         }
         //handling of executable-source-manaual-shell file and comands
         else if(fileExists(command)){ //is file exists executable or source file
 
             if(isExecutable(command)) {
-                array=launchProcess(command, tokens,process); //executable file
+
+                array = launchProcess(this, command, tokens, process, isBackground);
+
+                /*array=launchProcess(command, tokens,process); //executable file*/
                 qDebug()<<"exec file";// executable file passed by creating new process
             }
             else if (isSourceFile(command)) {
 
                 if(command.endsWith(".java", Qt::CaseInsensitive))
+
                     array=compileAndRunJava(command, tokens,process); //compliler source file : .java
                 else if(needsCompilation(command))
-                    array=compileAndRun(command, tokens,process); //compliler source file : .c .cpp
+
+                    array=compileAndRun(command, tokens,process,this,isBackground); //compliler source file : .c .cpp
                 else
                     array=runWithInterpreter(command, tokens,process); //interpreter src file : .py
             }
@@ -683,7 +810,7 @@ void ResponseWindow::onInputEntered()
         }
         else {
             //for both linux-windows same built-in beacause of internal management
-            if(windows_shell_cmd_map.find(tokens[0].toStdString())!= windows_shell_cmd_map.end() ){
+            if(tokens[0]=="jobs" || windows_shell_cmd_map.find(tokens[0].toStdString())!= windows_shell_cmd_map.end() ){
                 qDebug()<<"cd found in shell cmd map";
                 executeManualImplementedCommand(tokens,qstrInput,process);
 

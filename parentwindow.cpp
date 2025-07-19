@@ -113,8 +113,15 @@ void ParentWindow::addResponseWindowToTab(int tabIndex) {
         QWidget *newTab = new QWidget();
         ui->parentTabContainer->addTab(newTab, QString("Tab %1").arg(ui->parentTabContainer->count()+1));
 
-        QDir dir;//dir object
-        current_directory_map[ui->parentTabContainer->count()+1]=dir; //storing one object for mentaning directory level
+
+        QString execDir = QCoreApplication::applicationDirPath();  // or QDir::homePath()
+        QDir startDir(execDir);
+        current_directory_map[tabIndex] = startDir;
+
+
+        /*QDir dir;//dir object
+        dir.absolutePath();
+        current_directory_map[ui->parentTabContainer->count()+1]=dir;*/ //storing one object for mentaning directory level
 
         //inititalize tab by adding 1 mandatory as requirment for creating not creating when come again
         qDebug()<<"new tab creadted for passed index :"<<tabIndex;
